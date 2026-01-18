@@ -6,6 +6,7 @@ import { StatsCard } from '@/components/dashboard/StatsCard';
 import { ProjectCard, ProjectCardSkeleton } from '@/components/dashboard/ProjectCard';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { useDashboardStats, useActiveProjects, useRecentActivity } from '@/hooks/useDashboardData';
+import { useDashboardRealtime } from '@/hooks/useRealtimeSubscription';
 import { Plus, FolderOpen, BookOpen, Layers, CheckCircle, Star } from 'lucide-react';
 
 export default function Dashboard() {
@@ -13,6 +14,9 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: projects, isLoading: projectsLoading } = useActiveProjects();
   const { data: activities, isLoading: activitiesLoading } = useRecentActivity();
+  
+  // Enable real-time updates
+  useDashboardRealtime();
 
   return (
     <div className="space-y-8">

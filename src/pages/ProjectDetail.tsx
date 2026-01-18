@@ -19,6 +19,7 @@ import {
   restartProject,
 } from '@/hooks/useProjectDetail';
 import { useProjectQualityScores, useProjectOutputFiles } from '@/hooks/useQuality';
+import { useProjectRealtime } from '@/hooks/useRealtimeSubscription';
 import { toast } from 'sonner';
 import { FileText, Layers, Star, Download, ScrollText } from 'lucide-react';
 
@@ -27,6 +28,9 @@ export default function ProjectDetail() {
   const queryClient = useQueryClient();
   const [actionLoading, setActionLoading] = useState(false);
   const [logFilters, setLogFilters] = useState<{ phase?: number; level?: string; search?: string }>({});
+
+  // Enable real-time updates
+  const { isRecentlyUpdated } = useProjectRealtime(id);
 
   const { data: project, isLoading: projectLoading } = useProjectDetail(id!);
   const { data: chapters = [], isLoading: chaptersLoading } = useProjectChapters(id!);

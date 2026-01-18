@@ -110,3 +110,55 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
+
+/* Real-time update animations */
+@keyframes pulse-success {
+  0% { background-color: transparent; }
+  50% { background-color: hsl(var(--success) / 0.15); }
+  100% { background-color: transparent; }
+}
+
+@keyframes pulse-primary {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  70% { box-shadow: 0 0 0 10px hsl(var(--primary) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+@keyframes slide-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-pulse-success {
+    animation: pulse-success 1s ease-out;
+  }
+  
+  .animate-pulse-primary {
+    animation: pulse-primary 1.5s ease-out;
+  }
+  
+  .animate-slide-in-top {
+    animation: slide-in-top 0.3s ease-out;
+  }
+  
+  /* Smooth transitions */
+  .transition-base {
+    @apply transition-all duration-150 ease-in-out;
+  }
+  
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-md;
+  }
+}

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -16,6 +17,7 @@ interface ChaptersTableProps {
   projectId: string;
   chapters: Chapter[];
   loading?: boolean;
+  recentlyUpdatedIds?: Set<string>;
 }
 
 const STATUS_CONFIG: Record<Chapter['status'], { label: string; icon: typeof Check; className: string; iconClass?: string }> = {
@@ -42,7 +44,7 @@ const STATUS_CONFIG: Record<Chapter['status'], { label: string; icon: typeof Che
   },
 };
 
-export function ChaptersTable({ projectId, chapters, loading }: ChaptersTableProps) {
+export function ChaptersTable({ projectId, chapters, loading, recentlyUpdatedIds }: ChaptersTableProps) {
   const navigate = useNavigate();
 
   if (loading) {
@@ -63,48 +65,94 @@ export function ChaptersTable({ projectId, chapters, loading }: ChaptersTablePro
     );
   }
 
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16">#</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead className="w-32">Status</TableHead>
-            <TableHead className="w-20 text-center">Phase</TableHead>
-            <TableHead className="w-24 text-right">Quality</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {chapters.map((chapter) => {
-            const config = STATUS_CONFIG[chapter.status];
-            const Icon = config.icon;
+  const handleNavigate = (chapterNumber: number) => {
+    navigate(`/projects/${projectId}/chapters/${chapterNumber}`);
+  };
 
-            return (
-              <TableRow
-                key={chapter.id}
-                className="cursor-pointer hover:bg-accent/50"
-                onClick={() => navigate(`/projects/${projectId}/chapters/${chapter.chapterNumber}`)}
-              >
-                <TableCell className="font-medium">{chapter.chapterNumber}</TableCell>
-                <TableCell>{chapter.title || `Chapter ${chapter.chapterNumber}`}</TableCell>
-                <TableCell>
+  return (
+    <>
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16">#</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead className="w-32">Status</TableHead>
+              <TableHead className="w-20 text-center">Phase</TableHead>
+              <TableHead className="w-24 text-right">Quality</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {chapters.map((chapter) => {
+              const config = STATUS_CONFIG[chapter.status];
+              const Icon = config.icon;
+              const isUpdated = recentlyUpdatedIds?.has(chapter.id);
+
+              return (
+                <TableRow
+                  key={chapter.id}
+                  className={`cursor-pointer transition-colors hover:bg-accent/50 ${isUpdated ? 'animate-pulse-success' : ''}`}
+                  onClick={() => handleNavigate(chapter.chapterNumber)}
+                >
+                  <TableCell className="font-medium">{chapter.chapterNumber}</TableCell>
+                  <TableCell>{chapter.title || `Chapter ${chapter.chapterNumber}`}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className={config.className}>
+                      <Icon className={`h-3 w-3 mr-1 ${config.iconClass || ''}`} />
+                      {config.label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center text-muted-foreground">
+                    {chapter.status !== 'pending' ? chapter.currentPhase : '—'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {chapter.qualityScore !== null ? chapter.qualityScore.toFixed(2) : '—'}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {chapters.map((chapter) => {
+          const config = STATUS_CONFIG[chapter.status];
+          const Icon = config.icon;
+          const isUpdated = recentlyUpdatedIds?.has(chapter.id);
+
+          return (
+            <Card
+              key={chapter.id}
+              className={`cursor-pointer transition-all hover:shadow-md active:scale-[0.99] ${isUpdated ? 'animate-pulse-success' : ''}`}
+              onClick={() => handleNavigate(chapter.chapterNumber)}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground">
+                      Chapter {chapter.chapterNumber}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {chapter.title || `Untitled`}
+                    </p>
+                  </div>
                   <Badge variant="secondary" className={config.className}>
                     <Icon className={`h-3 w-3 mr-1 ${config.iconClass || ''}`} />
                     {config.label}
                   </Badge>
-                </TableCell>
-                <TableCell className="text-center text-muted-foreground">
-                  {chapter.status !== 'pending' ? chapter.currentPhase : '—'}
-                </TableCell>
-                <TableCell className="text-right">
-                  {chapter.qualityScore !== null ? chapter.qualityScore.toFixed(2) : '—'}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+                </div>
+                <div className="mt-3 flex justify-between text-sm text-muted-foreground">
+                  <span>Phase {chapter.status !== 'pending' ? chapter.currentPhase : '—'}</span>
+                  <span>Score: {chapter.qualityScore !== null ? chapter.qualityScore.toFixed(2) : '—'}</span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </>
   );
 }
