@@ -10,6 +10,7 @@ import { ContentTab } from '@/components/chapter/ContentTab';
 import { AnalysisTab } from '@/components/chapter/AnalysisTab';
 import { DiagramsTab } from '@/components/chapter/DiagramsTab';
 import { IssuesTab } from '@/components/chapter/IssuesTab';
+import { ChapterQualityTab } from '@/components/chapter/ChapterQualityTab';
 import {
   useChapterDetail,
   useChapterTactics,
@@ -20,6 +21,7 @@ import {
   ignoreIssue,
 } from '@/hooks/useChapterDetail';
 import { useProjectDetail } from '@/hooks/useProjectDetail';
+import { useChapterQualityScore, requestRevalidation } from '@/hooks/useQuality';
 import {
   ArrowLeft,
   Pencil,
@@ -49,12 +51,14 @@ export default function ChapterDetail() {
   const queryClient = useQueryClient();
   
   const [isEditing, setIsEditing] = useState(false);
+  const [revalidating, setRevalidating] = useState(false);
 
   const { data: project } = useProjectDetail(projectId!);
   const { data: chapter, isLoading: chapterLoading } = useChapterDetail(projectId!, chapterNumber);
   const { data: tactics = [], isLoading: tacticsLoading } = useChapterTactics(chapter?.id);
   const { data: diagrams = [], isLoading: diagramsLoading } = useChapterDiagrams(chapter?.id);
   const { data: issues = [], isLoading: issuesLoading } = useChapterIssues(chapter?.id);
+  const { data: qualityScore, isLoading: qualityLoading } = useChapterQualityScore(chapter?.id);
 
   const handleSaveContent = async (content: string) => {
     if (!chapter) return;
@@ -85,6 +89,20 @@ export default function ChapterDetail() {
       toast.success('Issue ignored');
     } catch (error: any) {
       toast.error(error.message || 'Failed to ignore issue');
+    }
+  };
+
+  const handleRequestRevalidation = async () => {
+    if (!chapter || !projectId) return;
+    setRevalidating(true);
+    try {
+      await requestRevalidation(chapter.id, projectId);
+      queryClient.invalidateQueries({ queryKey: ['project-logs', projectId] });
+      toast.success('Re-evaluation requested');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to request re-evaluation');
+    } finally {
+      setRevalidating(false);
     }
   };
 
@@ -220,15 +238,15 @@ export default function ChapterDetail() {
           <TabsContent value="quality">
             <Card>
               <CardHeader>
-                <CardTitle>
-                  Quality Score: {chapter.qualityScore !== null ? chapter.qualityScore.toFixed(2) : '—'}
-                </CardTitle>
+                <CardTitle>Quality Score</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Detailed quality breakdown coming in Phase 6</p>
-                </div>
+                <ChapterQualityTab
+                  qualityScore={qualityScore || null}
+                  loading={qualityLoading}
+                  onRequestRevalidation={handleRequestRevalidation}
+                  revalidating={revalidating}
+                />
               </CardContent>
             </Card>
           </TabsContent>

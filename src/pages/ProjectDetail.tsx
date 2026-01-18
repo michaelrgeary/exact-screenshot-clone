@@ -7,6 +7,8 @@ import { ProjectHeader } from '@/components/project/ProjectHeader';
 import { PipelineVisualization } from '@/components/project/PipelineVisualization';
 import { ChaptersTable } from '@/components/project/ChaptersTable';
 import { LogsFeed } from '@/components/project/LogsFeed';
+import { ProjectQualityTab } from '@/components/project/ProjectQualityTab';
+import { OutputsTab } from '@/components/project/OutputsTab';
 import {
   useProjectDetail,
   useProjectChapters,
@@ -16,6 +18,7 @@ import {
   stopProject,
   restartProject,
 } from '@/hooks/useProjectDetail';
+import { useProjectQualityScores, useProjectOutputFiles } from '@/hooks/useQuality';
 import { toast } from 'sonner';
 import { FileText, Layers, Star, Download, ScrollText } from 'lucide-react';
 
@@ -28,6 +31,8 @@ export default function ProjectDetail() {
   const { data: project, isLoading: projectLoading } = useProjectDetail(id!);
   const { data: chapters = [], isLoading: chaptersLoading } = useProjectChapters(id!);
   const { data: logs = [], isLoading: logsLoading, refetch: refetchLogs } = useProjectLogs(id!, logFilters);
+  const { data: qualityScores = [], isLoading: qualityLoading } = useProjectQualityScores(id!);
+  const { data: outputs = [], isLoading: outputsLoading } = useProjectOutputFiles(id!);
 
   const handleAction = async (action: () => Promise<void>, successMessage: string) => {
     setActionLoading(true);
@@ -122,11 +127,11 @@ export default function ProjectDetail() {
               <CardTitle>Quality Scores</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Quality scores will appear here as chapters are processed.</p>
-                <p className="text-sm mt-1">Coming in Phase 6</p>
-              </div>
+              <ProjectQualityTab
+                projectId={id!}
+                chapterScores={qualityScores}
+                loading={qualityLoading}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -138,16 +143,11 @@ export default function ProjectDetail() {
               <CardTitle>Output Files</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Download className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                {project?.status === 'completed' ? (
-                  <>
-                    <p>Download buttons coming in Phase 6</p>
-                  </>
-                ) : (
-                  <p>Outputs will be available when processing completes.</p>
-                )}
-              </div>
+              <OutputsTab
+                outputs={outputs}
+                projectStatus={project?.status || 'draft'}
+                loading={outputsLoading}
+              />
             </CardContent>
           </Card>
         </TabsContent>

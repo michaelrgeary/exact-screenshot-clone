@@ -176,6 +176,44 @@ export type Database = {
           },
         ]
       }
+      output_files: {
+        Row: {
+          created_at: string | null
+          file_path: string | null
+          file_size: number | null
+          format: string
+          id: string
+          language: string
+          project_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          format: string
+          id?: string
+          language: string
+          project_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          format?: string
+          id?: string
+          language?: string
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "output_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pipeline_logs: {
         Row: {
           agent_name: string | null
@@ -271,6 +309,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quality_scores: {
+        Row: {
+          actionability: number | null
+          chapter_id: string | null
+          clarity: number | null
+          consistency: number | null
+          content_fidelity: number | null
+          created_at: string | null
+          engagement: number | null
+          feedback: Json | null
+          flow: number | null
+          id: string
+          overall_score: number | null
+          passes_threshold: boolean | null
+          roofing_relevance: number | null
+          visual_integration: number | null
+        }
+        Insert: {
+          actionability?: number | null
+          chapter_id?: string | null
+          clarity?: number | null
+          consistency?: number | null
+          content_fidelity?: number | null
+          created_at?: string | null
+          engagement?: number | null
+          feedback?: Json | null
+          flow?: number | null
+          id?: string
+          overall_score?: number | null
+          passes_threshold?: boolean | null
+          roofing_relevance?: number | null
+          visual_integration?: number | null
+        }
+        Update: {
+          actionability?: number | null
+          chapter_id?: string | null
+          clarity?: number | null
+          consistency?: number | null
+          content_fidelity?: number | null
+          created_at?: string | null
+          engagement?: number | null
+          feedback?: Json | null
+          flow?: number | null
+          id?: string
+          overall_score?: number | null
+          passes_threshold?: boolean | null
+          roofing_relevance?: number | null
+          visual_integration?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quality_scores_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tactics: {
         Row: {
