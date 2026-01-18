@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -127,8 +128,8 @@ export default function GlossaryTab() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-md border">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -158,7 +159,7 @@ export default function GlossaryTab() {
               paginatedTerms.map((term) => (
                 <TableRow 
                   key={term.id} 
-                  className="cursor-pointer hover:bg-muted/50"
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => setEditingTerm(term)}
                 >
                   <TableCell className="font-medium">{term.english_term}</TableCell>
@@ -195,6 +196,71 @@ export default function GlossaryTab() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-4 space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))
+        ) : paginatedTerms.length === 0 ? (
+          <div className="text-center text-muted-foreground py-8">
+            No glossary terms found
+          </div>
+        ) : (
+          paginatedTerms.map((term) => (
+            <Card 
+              key={term.id} 
+              className="cursor-pointer transition-all hover:shadow-md active:scale-[0.99]"
+              onClick={() => setEditingTerm(term)}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground">{term.english_term}</p>
+                    {term.spanish_term && (
+                      <p className="text-sm text-primary">{term.spanish_term}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingTerm(term);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingTerm(term);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+                {term.definition && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                    {term.definition}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Pagination */}
