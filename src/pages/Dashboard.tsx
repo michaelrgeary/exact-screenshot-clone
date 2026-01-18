@@ -52,7 +52,7 @@ export default function Dashboard() {
         />
         <StatsCard
           label="Avg Quality Score"
-          value={stats?.averageQuality !== null ? stats.averageQuality.toFixed(2) : '—'}
+          value={stats?.averageQuality != null ? stats.averageQuality.toFixed(2) : '—'}
           icon={Star}
           loading={statsLoading}
         />
