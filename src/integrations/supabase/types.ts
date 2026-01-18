@@ -129,6 +129,44 @@ export type Database = {
           },
         ]
       }
+      glossary: {
+        Row: {
+          created_at: string | null
+          definition: string | null
+          english_term: string
+          id: string
+          project_id: string | null
+          spanish_term: string | null
+          usage_notes: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          definition?: string | null
+          english_term: string
+          id?: string
+          project_id?: string | null
+          spanish_term?: string | null
+          usage_notes?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          definition?: string | null
+          english_term?: string
+          id?: string
+          project_id?: string | null
+          spanish_term?: string | null
+          usage_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "glossary_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
           chapter_id: string | null
@@ -425,6 +463,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_settings: {
+        Row: {
+          created_at: string | null
+          default_processing_mode: string | null
+          email_notifications: boolean | null
+          id: string
+          notify_on_error: boolean | null
+          notify_on_phase_complete: boolean | null
+          quality_threshold: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          default_processing_mode?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notify_on_error?: boolean | null
+          notify_on_phase_complete?: boolean | null
+          quality_threshold?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          default_processing_mode?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notify_on_error?: boolean | null
+          notify_on_phase_complete?: boolean | null
+          quality_threshold?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
