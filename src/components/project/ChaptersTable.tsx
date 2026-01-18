@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -43,6 +43,8 @@ const STATUS_CONFIG: Record<Chapter['status'], { label: string; icon: typeof Che
 };
 
 export function ChaptersTable({ projectId, chapters, loading }: ChaptersTableProps) {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -82,7 +84,7 @@ export function ChaptersTable({ projectId, chapters, loading }: ChaptersTablePro
               <TableRow
                 key={chapter.id}
                 className="cursor-pointer hover:bg-accent/50"
-                onClick={() => {}}
+                onClick={() => navigate(`/projects/${projectId}/chapters/${chapter.chapterNumber}`)}
               >
                 <TableCell className="font-medium">{chapter.chapterNumber}</TableCell>
                 <TableCell>{chapter.title || `Chapter ${chapter.chapterNumber}`}</TableCell>

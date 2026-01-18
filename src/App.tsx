@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import NewProject from "./pages/NewProject";
 import ProjectDetail from "./pages/ProjectDetail";
+import ChapterDetail from "./pages/ChapterDetail";
 import LibraryPage from "./pages/LibraryPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/projects" element={<Projects />} />
               <Route path="/projects/new" element={<NewProject />} />
               <Route path="/projects/:id" element={<ProjectDetail />} />
+              <Route path="/projects/:id/chapters/:num" element={<ChapterDetail />} />
               <Route path="/library" element={<LibraryPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
