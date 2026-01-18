@@ -14,11 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      chapters: {
+        Row: {
+          chapter_number: number
+          created_at: string | null
+          current_phase: number | null
+          id: string
+          project_id: string | null
+          quality_score: number | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          chapter_number: number
+          created_at?: string | null
+          current_phase?: number | null
+          id?: string
+          project_id?: string | null
+          quality_score?: number | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          chapter_number?: number
+          created_at?: string | null
+          current_phase?: number | null
+          id?: string
+          project_id?: string | null
+          quality_score?: number | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pipeline_logs: {
+        Row: {
+          agent_name: string | null
+          chapter_id: string | null
+          created_at: string | null
+          id: string
+          log_level: string | null
+          message: string | null
+          phase: number | null
+          project_id: string | null
+        }
+        Insert: {
+          agent_name?: string | null
+          chapter_id?: string | null
+          created_at?: string | null
+          id?: string
+          log_level?: string | null
+          message?: string | null
+          phase?: number | null
+          project_id?: string | null
+        }
+        Update: {
+          agent_name?: string | null
+          chapter_id?: string | null
+          created_at?: string | null
+          id?: string
+          log_level?: string | null
+          message?: string | null
+          phase?: number | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_logs_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string | null
           current_phase: number | null
           id: string
+          overall_quality_score: number | null
+          processing_mode: string | null
           source_title: string
           status: string | null
           title: string
@@ -29,6 +123,8 @@ export type Database = {
           created_at?: string | null
           current_phase?: number | null
           id?: string
+          overall_quality_score?: number | null
+          processing_mode?: string | null
           source_title: string
           status?: string | null
           title: string
@@ -39,6 +135,8 @@ export type Database = {
           created_at?: string | null
           current_phase?: number | null
           id?: string
+          overall_quality_score?: number | null
+          processing_mode?: string | null
           source_title?: string
           status?: string | null
           title?: string
