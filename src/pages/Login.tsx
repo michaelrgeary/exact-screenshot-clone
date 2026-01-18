@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { BookOpen, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -35,13 +38,31 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
+      });
 
-    if (error) {
-      setError(error.message || 'Invalid email or password');
-      setLoading(false);
+      if (error) {
+        setError(error.message || 'Failed to create account');
+        setLoading(false);
+      } else {
+        toast.success('Account created successfully!');
+        navigate('/dashboard');
+      }
     } else {
-      navigate('/dashboard');
+      const { error } = await signIn(email, password);
+
+      if (error) {
+        setError(error.message || 'Invalid email or password');
+        setLoading(false);
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
@@ -54,7 +75,7 @@ export default function Login() {
           </div>
           <h1 className="text-2xl font-bold text-foreground">Book Maker</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Sign in to your account
+            {isSignUp ? 'Create your account' : 'Sign in to your account'}
           </p>
         </CardHeader>
         <CardContent className="pt-4">
@@ -95,21 +116,35 @@ export default function Login() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  {isSignUp ? 'Creating account...' : 'Signing in...'}
                 </>
               ) : (
-                'Log In'
+                isSignUp ? 'Create Account' : 'Log In'
               )}
             </Button>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <button
                 type="button"
-                className="text-sm text-primary hover:underline"
-                onClick={() => alert('Password reset functionality coming soon')}
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                }}
               >
-                Forgot Password?
+                {isSignUp ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
               </button>
+              {!isSignUp && (
+                <div>
+                  <button
+                    type="button"
+                    className="text-sm text-primary hover:underline"
+                    onClick={() => alert('Password reset functionality coming soon')}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
             </div>
           </form>
         </CardContent>
