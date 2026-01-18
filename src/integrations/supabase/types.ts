@@ -111,8 +111,11 @@ export type Database = {
           created_at: string | null
           current_phase: number | null
           id: string
+          output_formats: string[] | null
+          output_languages: string[] | null
           overall_quality_score: number | null
           processing_mode: string | null
+          source_file_path: string | null
           source_title: string
           status: string | null
           title: string
@@ -123,8 +126,11 @@ export type Database = {
           created_at?: string | null
           current_phase?: number | null
           id?: string
+          output_formats?: string[] | null
+          output_languages?: string[] | null
           overall_quality_score?: number | null
           processing_mode?: string | null
+          source_file_path?: string | null
           source_title: string
           status?: string | null
           title: string
@@ -135,8 +141,11 @@ export type Database = {
           created_at?: string | null
           current_phase?: number | null
           id?: string
+          output_formats?: string[] | null
+          output_languages?: string[] | null
           overall_quality_score?: number | null
           processing_mode?: string | null
+          source_file_path?: string | null
           source_title?: string
           status?: string | null
           title?: string
