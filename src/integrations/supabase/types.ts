@@ -19,34 +19,58 @@ export type Database = {
           chapter_number: number
           created_at: string | null
           current_phase: number | null
+          draft_text: string | null
+          edited_text: string | null
           id: string
+          original_text: string | null
           project_id: string | null
+          quality_breakdown: Json | null
           quality_score: number | null
+          spanish_text: string | null
           status: string | null
+          summary: string | null
           title: string | null
+          transformed_text: string | null
           updated_at: string | null
+          word_count: number | null
         }
         Insert: {
           chapter_number: number
           created_at?: string | null
           current_phase?: number | null
+          draft_text?: string | null
+          edited_text?: string | null
           id?: string
+          original_text?: string | null
           project_id?: string | null
+          quality_breakdown?: Json | null
           quality_score?: number | null
+          spanish_text?: string | null
           status?: string | null
+          summary?: string | null
           title?: string | null
+          transformed_text?: string | null
           updated_at?: string | null
+          word_count?: number | null
         }
         Update: {
           chapter_number?: number
           created_at?: string | null
           current_phase?: number | null
+          draft_text?: string | null
+          edited_text?: string | null
           id?: string
+          original_text?: string | null
           project_id?: string | null
+          quality_breakdown?: Json | null
           quality_score?: number | null
+          spanish_text?: string | null
           status?: string | null
+          summary?: string | null
           title?: string | null
+          transformed_text?: string | null
           updated_at?: string | null
+          word_count?: number | null
         }
         Relationships: [
           {
@@ -54,6 +78,100 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagrams: {
+        Row: {
+          caption_en: string | null
+          caption_es: string | null
+          chapter_id: string | null
+          code: string | null
+          created_at: string | null
+          diagram_type: string | null
+          file_path: string | null
+          id: string
+          placement: string | null
+          specification: Json | null
+        }
+        Insert: {
+          caption_en?: string | null
+          caption_es?: string | null
+          chapter_id?: string | null
+          code?: string | null
+          created_at?: string | null
+          diagram_type?: string | null
+          file_path?: string | null
+          id?: string
+          placement?: string | null
+          specification?: Json | null
+        }
+        Update: {
+          caption_en?: string | null
+          caption_es?: string | null
+          chapter_id?: string | null
+          code?: string | null
+          created_at?: string | null
+          diagram_type?: string | null
+          file_path?: string | null
+          id?: string
+          placement?: string | null
+          specification?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagrams_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      issues: {
+        Row: {
+          chapter_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          issue_type: string | null
+          location: string | null
+          resolution: string | null
+          resolved_at: string | null
+          severity: string | null
+          status: string | null
+        }
+        Insert: {
+          chapter_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          issue_type?: string | null
+          location?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+        }
+        Update: {
+          chapter_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          issue_type?: string | null
+          location?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issues_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
             referencedColumns: ["id"]
           },
         ]
@@ -153,6 +271,63 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tactics: {
+        Row: {
+          category: string | null
+          chapter_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          original_context: string | null
+          project_id: string | null
+          roofing_context: string | null
+          source_quote: string | null
+          type: string | null
+        }
+        Insert: {
+          category?: string | null
+          chapter_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          original_context?: string | null
+          project_id?: string | null
+          roofing_context?: string | null
+          source_quote?: string | null
+          type?: string | null
+        }
+        Update: {
+          category?: string | null
+          chapter_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          original_context?: string | null
+          project_id?: string | null
+          roofing_context?: string | null
+          source_quote?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tactics_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tactics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
