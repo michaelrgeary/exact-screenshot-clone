@@ -48,57 +48,111 @@ export type Database = {
       }
       chapters: {
         Row: {
+          analysis_quotes: Json | null
+          analysis_stories: Json | null
           chapter_number: number
           created_at: string | null
           current_phase: number | null
           draft_text: string | null
           edited_text: string | null
+          examples: Json | null
+          final_text: string | null
           id: string
           original_text: string | null
+          originality_score: number | null
+          outline: string | null
+          phase_1_complete: boolean | null
+          phase_2_complete: boolean | null
+          phase_3_complete: boolean | null
+          phase_4_complete: boolean | null
+          phase_5_complete: boolean | null
+          phase_6_complete: boolean | null
+          phase_7_complete: boolean | null
+          phase_8_complete: boolean | null
+          phase_9_complete: boolean | null
           project_id: string | null
           quality_breakdown: Json | null
           quality_score: number | null
+          reading_level: string | null
+          sections: Json | null
           spanish_text: string | null
           status: string | null
           summary: string | null
+          takeaways: string | null
           title: string | null
           transformed_text: string | null
           updated_at: string | null
           word_count: number | null
         }
         Insert: {
+          analysis_quotes?: Json | null
+          analysis_stories?: Json | null
           chapter_number: number
           created_at?: string | null
           current_phase?: number | null
           draft_text?: string | null
           edited_text?: string | null
+          examples?: Json | null
+          final_text?: string | null
           id?: string
           original_text?: string | null
+          originality_score?: number | null
+          outline?: string | null
+          phase_1_complete?: boolean | null
+          phase_2_complete?: boolean | null
+          phase_3_complete?: boolean | null
+          phase_4_complete?: boolean | null
+          phase_5_complete?: boolean | null
+          phase_6_complete?: boolean | null
+          phase_7_complete?: boolean | null
+          phase_8_complete?: boolean | null
+          phase_9_complete?: boolean | null
           project_id?: string | null
           quality_breakdown?: Json | null
           quality_score?: number | null
+          reading_level?: string | null
+          sections?: Json | null
           spanish_text?: string | null
           status?: string | null
           summary?: string | null
+          takeaways?: string | null
           title?: string | null
           transformed_text?: string | null
           updated_at?: string | null
           word_count?: number | null
         }
         Update: {
+          analysis_quotes?: Json | null
+          analysis_stories?: Json | null
           chapter_number?: number
           created_at?: string | null
           current_phase?: number | null
           draft_text?: string | null
           edited_text?: string | null
+          examples?: Json | null
+          final_text?: string | null
           id?: string
           original_text?: string | null
+          originality_score?: number | null
+          outline?: string | null
+          phase_1_complete?: boolean | null
+          phase_2_complete?: boolean | null
+          phase_3_complete?: boolean | null
+          phase_4_complete?: boolean | null
+          phase_5_complete?: boolean | null
+          phase_6_complete?: boolean | null
+          phase_7_complete?: boolean | null
+          phase_8_complete?: boolean | null
+          phase_9_complete?: boolean | null
           project_id?: string | null
           quality_breakdown?: Json | null
           quality_score?: number | null
+          reading_level?: string | null
+          sections?: Json | null
           spanish_text?: string | null
           status?: string | null
           summary?: string | null
+          takeaways?: string | null
           title?: string | null
           transformed_text?: string | null
           updated_at?: string | null
@@ -240,7 +294,9 @@ export type Database = {
           file_path: string | null
           id: string
           placement: string | null
+          render_valid: boolean | null
           specification: Json | null
+          title: string | null
         }
         Insert: {
           caption_en?: string | null
@@ -252,7 +308,9 @@ export type Database = {
           file_path?: string | null
           id?: string
           placement?: string | null
+          render_valid?: boolean | null
           specification?: Json | null
+          title?: string | null
         }
         Update: {
           caption_en?: string | null
@@ -264,7 +322,9 @@ export type Database = {
           file_path?: string | null
           id?: string
           placement?: string | null
+          render_valid?: boolean | null
           specification?: Json | null
+          title?: string | null
         }
         Relationships: [
           {
@@ -282,6 +342,7 @@ export type Database = {
           definition: string | null
           english_term: string
           id: string
+          introduced_in_chapter: string | null
           project_id: string | null
           spanish_term: string | null
           usage_notes: string | null
@@ -291,6 +352,7 @@ export type Database = {
           definition?: string | null
           english_term: string
           id?: string
+          introduced_in_chapter?: string | null
           project_id?: string | null
           spanish_term?: string | null
           usage_notes?: string | null
@@ -300,11 +362,19 @@ export type Database = {
           definition?: string | null
           english_term?: string
           id?: string
+          introduced_in_chapter?: string | null
           project_id?: string | null
           spanish_term?: string | null
           usage_notes?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "glossary_introduced_in_chapter_fkey"
+            columns: ["introduced_in_chapter"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "glossary_project_id_fkey"
             columns: ["project_id"]
@@ -319,11 +389,13 @@ export type Database = {
           chapter_id: string | null
           created_at: string | null
           description: string | null
+          flagged_by: string | null
           id: string
           issue_type: string | null
           location: string | null
           resolution: string | null
           resolved_at: string | null
+          resolved_by: string | null
           severity: string | null
           status: string | null
         }
@@ -331,11 +403,13 @@ export type Database = {
           chapter_id?: string | null
           created_at?: string | null
           description?: string | null
+          flagged_by?: string | null
           id?: string
           issue_type?: string | null
           location?: string | null
           resolution?: string | null
           resolved_at?: string | null
+          resolved_by?: string | null
           severity?: string | null
           status?: string | null
         }
@@ -343,11 +417,13 @@ export type Database = {
           chapter_id?: string | null
           created_at?: string | null
           description?: string | null
+          flagged_by?: string | null
           id?: string
           issue_type?: string | null
           location?: string | null
           resolution?: string | null
           resolved_at?: string | null
+          resolved_by?: string | null
           severity?: string | null
           status?: string | null
         }
@@ -404,6 +480,7 @@ export type Database = {
           agent_name: string | null
           chapter_id: string | null
           created_at: string | null
+          details: Json | null
           id: string
           log_level: string | null
           message: string | null
@@ -414,6 +491,7 @@ export type Database = {
           agent_name?: string | null
           chapter_id?: string | null
           created_at?: string | null
+          details?: Json | null
           id?: string
           log_level?: string | null
           message?: string | null
@@ -424,6 +502,7 @@ export type Database = {
           agent_name?: string | null
           chapter_id?: string | null
           created_at?: string | null
+          details?: Json | null
           id?: string
           log_level?: string | null
           message?: string | null
@@ -560,39 +639,48 @@ export type Database = {
           chapter_id: string | null
           created_at: string | null
           description: string | null
+          duplicate_of: string | null
           id: string
           name: string
           original_context: string | null
           project_id: string | null
           roofing_context: string | null
           source_quote: string | null
+          subcategory: string | null
           type: string | null
+          used_in_chapters: Json | null
         }
         Insert: {
           category?: string | null
           chapter_id?: string | null
           created_at?: string | null
           description?: string | null
+          duplicate_of?: string | null
           id?: string
           name: string
           original_context?: string | null
           project_id?: string | null
           roofing_context?: string | null
           source_quote?: string | null
+          subcategory?: string | null
           type?: string | null
+          used_in_chapters?: Json | null
         }
         Update: {
           category?: string | null
           chapter_id?: string | null
           created_at?: string | null
           description?: string | null
+          duplicate_of?: string | null
           id?: string
           name?: string
           original_context?: string | null
           project_id?: string | null
           roofing_context?: string | null
           source_quote?: string | null
+          subcategory?: string | null
           type?: string | null
+          used_in_chapters?: Json | null
         }
         Relationships: [
           {
@@ -600,6 +688,13 @@ export type Database = {
             columns: ["chapter_id"]
             isOneToOne: false
             referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tactics_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "tactics"
             referencedColumns: ["id"]
           },
           {
