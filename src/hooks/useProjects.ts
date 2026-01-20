@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import * as pipelineApi from '@/services/pipelineApi';
 
 export type ProjectStatus = 'draft' | 'running' | 'paused' | 'completed' | 'error';
 
@@ -149,10 +150,15 @@ export async function createProject(data: {
 }
 
 export async function startProject(projectId: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status: 'running' })
-    .eq('id', projectId);
-
-  if (error) throw error;
+  try {
+    // Start the pipeline via backend API (this triggers actual processing)
+    await pipelineApi.startPipeline(projectId);
+  } catch {
+    // If backend is unavailable, at least update the status
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'running' })
+      .eq('id', projectId);
+    if (error) throw error;
+  }
 }

@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
+import * as pipelineApi from '@/services/pipelineApi';
 
 export interface ProjectDetail {
   id: string;
@@ -194,33 +195,57 @@ export function useProjectLogs(projectId: string, filters?: { phase?: number; le
 }
 
 export async function pauseProject(projectId: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status: 'paused' })
-    .eq('id', projectId);
-  if (error) throw error;
+  try {
+    // Try to pause via backend API first (handles running pipeline)
+    await pipelineApi.pausePipeline(projectId);
+  } catch {
+    // If backend is unavailable, update status directly
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'paused' })
+      .eq('id', projectId);
+    if (error) throw error;
+  }
 }
 
 export async function resumeProject(projectId: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status: 'running' })
-    .eq('id', projectId);
-  if (error) throw error;
+  try {
+    // Try to resume via backend API first
+    await pipelineApi.resumePipeline(projectId);
+  } catch {
+    // If backend is unavailable, update status directly
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'running' })
+      .eq('id', projectId);
+    if (error) throw error;
+  }
 }
 
 export async function stopProject(projectId: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status: 'draft' })
-    .eq('id', projectId);
-  if (error) throw error;
+  try {
+    // Try to stop via backend API first
+    await pipelineApi.stopPipeline(projectId);
+  } catch {
+    // If backend is unavailable, update status directly
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'draft' })
+      .eq('id', projectId);
+    if (error) throw error;
+  }
 }
 
 export async function restartProject(projectId: string): Promise<void> {
-  const { error } = await supabase
-    .from('projects')
-    .update({ status: 'running', current_phase: 0 })
-    .eq('id', projectId);
-  if (error) throw error;
+  try {
+    // Try to restart via backend API
+    await pipelineApi.startPipeline(projectId, { start_phase: 1 });
+  } catch {
+    // If backend is unavailable, update status directly
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'running', current_phase: 0 })
+      .eq('id', projectId);
+    if (error) throw error;
+  }
 }

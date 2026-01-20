@@ -3,4 +3,6 @@
 
 from .config import config
 
-__all__ = ["config"]
+__all__ = [
+    "config",
+]
