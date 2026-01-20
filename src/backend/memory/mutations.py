@@ -22,6 +22,13 @@ def update_project_quality_score(project_id: str, score: float) -> None:
 
 
 # Chapter mutations
+def create_chapter(project_id: str, chapter_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a single chapter."""
+    chapter_data["project_id"] = project_id
+    result = db.insert("chapters", data=chapter_data)
+    return result[0] if isinstance(result, list) else result
+
+
 def create_chapters(project_id: str, chapters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Create multiple chapters for a project."""
     for ch in chapters:
@@ -53,6 +60,42 @@ def update_chapter_content(chapter_id: str, field: str, content: str) -> None:
     )
 
 
+def mark_chapter_phase_complete(chapter_id: str, phase: int) -> None:
+    """Mark a phase as complete for a chapter."""
+    phase_field = f"phase_{phase}_complete"
+    db.update(
+        "chapters",
+        data={phase_field: True, "updated_at": datetime.utcnow().isoformat()},
+        filters={"id.eq": chapter_id}
+    )
+
+
+def update_chapter_analysis(chapter_id: str, stories: List[Dict], quotes: List[Dict]) -> None:
+    """Update chapter analysis results."""
+    db.update(
+        "chapters",
+        data={
+            "analysis_stories": stories,
+            "analysis_quotes": quotes,
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        filters={"id.eq": chapter_id}
+    )
+
+
+def update_chapter_outline(chapter_id: str, outline: str, sections: List[Dict]) -> None:
+    """Update chapter outline and sections."""
+    db.update(
+        "chapters",
+        data={
+            "outline": outline,
+            "sections": sections,
+            "updated_at": datetime.utcnow().isoformat()
+        },
+        filters={"id.eq": chapter_id}
+    )
+
+
 # Tactics mutations
 def create_tactic(project_id: str, chapter_id: str, tactic: Dict[str, Any]) -> Dict[str, Any]:
     """Create a tactic."""
@@ -66,6 +109,21 @@ def create_tactics_batch(tactics: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Create multiple tactics at once."""
     result = db.insert("tactics", data=tactics)
     return result if isinstance(result, list) else [result]
+
+
+def update_tactic(tactic_id: str, data: Dict[str, Any]) -> None:
+    """Update a tactic."""
+    db.update("tactics", data=data, filters={"id.eq": tactic_id})
+
+
+def mark_tactic_duplicate(tactic_id: str, duplicate_of: str) -> None:
+    """Mark a tactic as a duplicate of another."""
+    db.update("tactics", data={"duplicate_of": duplicate_of}, filters={"id.eq": tactic_id})
+
+
+def update_tactic_usage(tactic_id: str, used_in_chapters: List[str]) -> None:
+    """Update which chapters use this tactic."""
+    db.update("tactics", data={"used_in_chapters": used_in_chapters}, filters={"id.eq": tactic_id})
 
 
 # Glossary mutations
@@ -84,6 +142,14 @@ def create_glossary_batch(project_id: str, terms: List[Dict[str, Any]]) -> List[
     return result if isinstance(result, list) else [result]
 
 
+def update_glossary_spanish(term_id: str, spanish_term: str, spanish_definition: Optional[str] = None) -> None:
+    """Add Spanish translation to a glossary term."""
+    data = {"spanish_term": spanish_term}
+    if spanish_definition:
+        data["spanish_definition"] = spanish_definition
+    db.update("glossary", data=data, filters={"id.eq": term_id})
+
+
 # Diagram mutations
 def create_diagram(chapter_id: str, diagram: Dict[str, Any]) -> Dict[str, Any]:
     """Create a diagram."""
@@ -94,6 +160,19 @@ def create_diagram(chapter_id: str, diagram: Dict[str, Any]) -> Dict[str, Any]:
 
 def update_diagram(diagram_id: str, data: Dict[str, Any]) -> None:
     """Update a diagram."""
+    db.update("diagrams", data=data, filters={"id.eq": diagram_id})
+
+
+def mark_diagram_valid(diagram_id: str, valid: bool = True) -> None:
+    """Mark a diagram as render-valid or invalid."""
+    db.update("diagrams", data={"render_valid": valid}, filters={"id.eq": diagram_id})
+
+
+def update_diagram_captions(diagram_id: str, caption_en: str, caption_es: Optional[str] = None) -> None:
+    """Update diagram captions."""
+    data = {"caption_en": caption_en}
+    if caption_es:
+        data["caption_es"] = caption_es
     db.update("diagrams", data=data, filters={"id.eq": diagram_id})
 
 
@@ -109,21 +188,192 @@ def create_quality_score(chapter_id: str, scores: Dict[str, Any]) -> Dict[str, A
 def create_issue(chapter_id: str, issue: Dict[str, Any]) -> Dict[str, Any]:
     """Create an issue for a chapter."""
     issue["chapter_id"] = chapter_id
+    issue["status"] = issue.get("status", "open")
     result = db.insert("issues", data=issue)
     return result[0] if isinstance(result, list) else result
 
 
-def resolve_issue(issue_id: str, resolution: str) -> None:
+def flag_issue(
+    chapter_id: str,
+    issue_type: str,
+    severity: str,
+    description: str,
+    location: str,
+    flagged_by: str
+) -> Dict[str, Any]:
+    """Flag a new issue found by an agent."""
+    issue = {
+        "chapter_id": chapter_id,
+        "issue_type": issue_type,
+        "severity": severity,
+        "description": description,
+        "location": location,
+        "flagged_by": flagged_by,
+        "status": "open"
+    }
+    result = db.insert("issues", data=issue)
+    return result[0] if isinstance(result, list) else result
+
+
+def resolve_issue(issue_id: str, resolution: str, resolved_by: str) -> None:
     """Resolve an issue."""
     db.update(
         "issues",
         data={
             "status": "resolved",
             "resolution": resolution,
+            "resolved_by": resolved_by,
             "resolved_at": datetime.utcnow().isoformat()
         },
         filters={"id.eq": issue_id}
     )
+
+
+def ignore_issue(issue_id: str, reason: str, ignored_by: str) -> None:
+    """Mark an issue as ignored."""
+    db.update(
+        "issues",
+        data={
+            "status": "ignored",
+            "resolution": reason,
+            "resolved_by": ignored_by,
+            "resolved_at": datetime.utcnow().isoformat()
+        },
+        filters={"id.eq": issue_id}
+    )
+
+
+# Cross-reference mutations
+def create_cross_ref(
+    project_id: str,
+    from_chapter_id: str,
+    to_chapter_id: str,
+    reason: str,
+    location_hint: Optional[str] = None
+) -> Dict[str, Any]:
+    """Create a cross-reference between chapters."""
+    data = {
+        "project_id": project_id,
+        "from_chapter_id": from_chapter_id,
+        "to_chapter_id": to_chapter_id,
+        "reason": reason,
+        "verified": False
+    }
+    if location_hint:
+        data["location_hint"] = location_hint
+    result = db.insert("cross_refs", data=data)
+    return result[0] if isinstance(result, list) else result
+
+
+def verify_cross_ref(cross_ref_id: str, reference_text: str) -> None:
+    """Verify a cross-reference and set its text."""
+    db.update(
+        "cross_refs",
+        data={"verified": True, "reference_text": reference_text},
+        filters={"id.eq": cross_ref_id}
+    )
+
+
+def delete_cross_ref(cross_ref_id: str) -> None:
+    """Delete a cross-reference."""
+    db.delete("cross_refs", filters={"id.eq": cross_ref_id})
+
+
+# Book context mutations
+def set_book_context(project_id: str, key: str, value: str) -> Dict[str, Any]:
+    """Set a book context value (upsert)."""
+    existing = db.select(
+        "book_context",
+        filters={"project_id.eq": project_id, "key.eq": key}
+    )
+    if existing:
+        db.update(
+            "book_context",
+            data={"value": value, "updated_at": datetime.utcnow().isoformat()},
+            filters={"project_id.eq": project_id, "key.eq": key}
+        )
+        return existing[0]
+    else:
+        result = db.insert("book_context", data={
+            "project_id": project_id,
+            "key": key,
+            "value": value
+        })
+        return result[0] if isinstance(result, list) else result
+
+
+def save_style_guide(project_id: str, style_guide: str) -> None:
+    """Save the style guide for a project."""
+    set_book_context(project_id, "style_guide", style_guide)
+
+
+def save_book_structure(project_id: str, structure: str) -> None:
+    """Save the book structure for a project."""
+    set_book_context(project_id, "structure", structure)
+
+
+def save_spanish_style_guide(project_id: str, style_guide: str) -> None:
+    """Save the Spanish style guide for a project."""
+    set_book_context(project_id, "spanish_style_guide", style_guide)
+
+
+def save_raw_markdown(project_id: str, markdown: str) -> None:
+    """Save the raw markdown for a project."""
+    set_book_context(project_id, "raw_markdown", markdown)
+
+
+# Decision mutations
+def log_decision(
+    project_id: str,
+    agent_name: str,
+    decision_type: str,
+    subject: str,
+    decision: str,
+    reasoning: str,
+    confidence: str = "high",
+    chapter_id: Optional[str] = None,
+    alternatives: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """Log an agent decision for audit purposes."""
+    data = {
+        "project_id": project_id,
+        "agent_name": agent_name,
+        "decision_type": decision_type,
+        "subject": subject,
+        "decision": decision,
+        "reasoning": reasoning,
+        "confidence": confidence
+    }
+    if chapter_id:
+        data["chapter_id"] = chapter_id
+    if alternatives:
+        data["alternatives"] = alternatives
+    result = db.insert("decisions", data=data)
+    return result[0] if isinstance(result, list) else result
+
+
+# Validation log mutations
+def log_validation(
+    project_id: str,
+    validator_name: str,
+    phase: int,
+    passed: bool,
+    failures: Optional[List[Dict]] = None,
+    chapter_id: Optional[str] = None
+) -> Dict[str, Any]:
+    """Log a validation result."""
+    data = {
+        "project_id": project_id,
+        "validator_name": validator_name,
+        "phase": phase,
+        "passed": passed
+    }
+    if chapter_id:
+        data["chapter_id"] = chapter_id
+    if failures:
+        data["failures"] = failures
+    result = db.insert("validation_log", data=data)
+    return result[0] if isinstance(result, list) else result
 
 
 # Pipeline logging
