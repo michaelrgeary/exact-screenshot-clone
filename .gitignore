@@ -1,3 +1,17 @@
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+
 # Logs
 logs
 *.log
