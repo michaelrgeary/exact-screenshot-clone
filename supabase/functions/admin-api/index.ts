@@ -16,6 +16,11 @@ const TABLE_PERMISSIONS: Record<string, { select: boolean; insert: boolean; upda
   issues: { select: true, insert: true, update: true, delete: false },
   pipeline_logs: { select: true, insert: true, update: false, delete: false },
   output_files: { select: true, insert: true, update: false, delete: false },
+  // New tables for pipeline expansion
+  cross_refs: { select: true, insert: true, update: true, delete: true },
+  book_context: { select: true, insert: true, update: true, delete: false },
+  decisions: { select: true, insert: true, update: false, delete: false },
+  validation_log: { select: true, insert: true, update: false, delete: false },
 };
 
 type Action = "select" | "insert" | "update" | "upsert" | "delete";
