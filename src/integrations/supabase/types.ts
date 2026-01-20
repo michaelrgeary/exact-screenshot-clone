@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_context: {
+        Row: {
+          id: string
+          key: string
+          project_id: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          project_id: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          project_id?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_context_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chapters: {
         Row: {
           chapter_number: number
@@ -75,6 +107,121 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "chapters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cross_refs: {
+        Row: {
+          created_at: string | null
+          from_chapter_id: string
+          id: string
+          location_hint: string | null
+          project_id: string
+          reason: string | null
+          reference_text: string | null
+          to_chapter_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          from_chapter_id: string
+          id?: string
+          location_hint?: string | null
+          project_id: string
+          reason?: string | null
+          reference_text?: string | null
+          to_chapter_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          from_chapter_id?: string
+          id?: string
+          location_hint?: string | null
+          project_id?: string
+          reason?: string | null
+          reference_text?: string | null
+          to_chapter_id?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_refs_from_chapter_id_fkey"
+            columns: ["from_chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_refs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_refs_to_chapter_id_fkey"
+            columns: ["to_chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decisions: {
+        Row: {
+          agent_name: string
+          alternatives: Json | null
+          chapter_id: string | null
+          confidence: string | null
+          created_at: string | null
+          decision: string | null
+          decision_type: string | null
+          id: string
+          project_id: string
+          reasoning: string | null
+          subject: string | null
+        }
+        Insert: {
+          agent_name: string
+          alternatives?: Json | null
+          chapter_id?: string | null
+          confidence?: string | null
+          created_at?: string | null
+          decision?: string | null
+          decision_type?: string | null
+          id?: string
+          project_id: string
+          reasoning?: string | null
+          subject?: string | null
+        }
+        Update: {
+          agent_name?: string
+          alternatives?: Json | null
+          chapter_id?: string | null
+          confidence?: string | null
+          created_at?: string | null
+          decision?: string | null
+          decision_type?: string | null
+          id?: string
+          project_id?: string
+          reasoning?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decisions_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decisions_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -499,6 +646,54 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      validation_log: {
+        Row: {
+          chapter_id: string | null
+          created_at: string | null
+          failures: Json | null
+          id: string
+          passed: boolean
+          phase: number | null
+          project_id: string
+          validator_name: string
+        }
+        Insert: {
+          chapter_id?: string | null
+          created_at?: string | null
+          failures?: Json | null
+          id?: string
+          passed: boolean
+          phase?: number | null
+          project_id: string
+          validator_name: string
+        }
+        Update: {
+          chapter_id?: string | null
+          created_at?: string | null
+          failures?: Json | null
+          id?: string
+          passed?: boolean
+          phase?: number | null
+          project_id?: string
+          validator_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "validation_log_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "validation_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
